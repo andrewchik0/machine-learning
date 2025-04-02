@@ -1,3 +1,6 @@
+import json
+import os
+
 import numpy as np
 
 def _xavier_uniform(n_in, n_out):
@@ -23,17 +26,18 @@ class Network:
     drop_factor = 1.0
     epochs_drop = 1000
 
-    def __init__(self, layer_sizes, learning_rate=0.01):
+    def __init__(self, layer_sizes=[], learning_rate=0.01):
         np.random.seed(42)
         self.__lr = learning_rate
         self.__training_data = np.array([])
+        self.__layer_sizes = layer_sizes
         self.__outputs = np.array([])
 
-        self.weights = [
+        self.__weights = [
             _xavier_normal(layer_sizes[i + 1], layer_sizes[i]).T
             for i in range(len(layer_sizes) - 1)
         ]
-        self.biases = [
+        self.__biases = [
             np.zeros(layer_sizes[i + 1]).reshape(-1, 1)
             for i in range(len(layer_sizes) - 1)
         ]
@@ -42,7 +46,7 @@ class Network:
         activations = [x]
         pre_activations = []
 
-        for w, b in zip(self.weights, self.biases):
+        for w, b in zip(self.__weights, self.__biases):
             z = np.dot(w, activations[-1]) + b
             pre_activations.append(z)
             a = _leaky_relu(z)
@@ -59,8 +63,8 @@ class Network:
         dws = [dw]
         dbs = [db]
 
-        for i in range(len(self.weights) - 2, -1, -1):
-            dz = np.dot(self.weights[i + 1].T, dz) * activations[i + 1] * (1 - activations[i + 1])
+        for i in range(len(self.__weights) - 2, -1, -1):
+            dz = np.dot(self.__weights[i + 1].T, dz) * activations[i + 1] * (1 - activations[i + 1])
             dw = np.dot(dz, activations[i].T) / m
             db = np.sum(dz, axis=1, keepdims=True) / m
 
@@ -81,10 +85,28 @@ class Network:
             pre_activations, activations = self.__forward_prop(self.__training_data)
             dws, dbs = self.__back_prop(samples, pre_activations, activations, self.__outputs)
 
-            for j in range(len(self.weights)):
-                self.weights[j] -= lr * dws[j]
-                self.biases[j] -= lr * dbs[j]
+            for j in range(len(self.__weights)):
+                self.__weights[j] -= lr * dws[j]
+                self.__biases[j] -= lr * dbs[j]
 
     def predict(self, inputs):
         _, activations = self.__forward_prop(inputs)
         return np.squeeze(activations[-1])
+
+    def serialize(self, filename):
+        directory = os.path.dirname(filename)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        network_data = {
+            "layer_sizes": self.__layer_sizes,
+            "weights": [w.tolist() for w in self.__weights],
+            "biases": [b.tolist() for b in self.__biases]
+        }
+        json.dump(network_data, open(filename, "w"))
+
+    def deserialize(self, filename):
+        serialized = json.loads(open(filename, "rb").read())
+        self.__weights = serialized["weights"]
+        self.__biases = serialized["biases"]
+        self.__layer_sizes = serialized["layer_sizes"]
