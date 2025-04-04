@@ -12,5 +12,5 @@ if __name__ == '__main__':
     net.load_training_data(total_input, y_xor)
     net.train(iterations=100000)
 
-    net.serialize("trained/binary_xor.json")
+    net.serialize("../trained/binary_xor.json")
 

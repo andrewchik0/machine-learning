@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Digit recognition</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+    <style>
+        html {
+            font-family: Roboto, sans-serif;
+            background-color: #101010;
+            color: white
+        }
+
+        header {
+          display: flex;
+          align-items: center;
+          gap: 200px;
+        }
+
+        h2 {
+          margin-left: 16px;
+        }
+
+        .canvas {
+            border: none;
+            touch-action: none;
+            --scale: 16.0;
+            margin: calc(28px * var(--scale) * 0.5);
+            scale: var(--scale);
+            image-rendering: pixelated;
+            background-color: white;
+            filter: invert(1);
+        }
+
+        .container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .result {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .result_digit {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 20px;
+        }
+
+        .result_bar {
+            display: inline-block;
+            width: 80px;
+            height: 32px;
+            border-radius: 8px;
+            background-color: #303030;
+            overflow: hidden;
+        }
+
+        .result_progress {
+            background-color: forestgreen;
+            display: inline-block;
+            width: calc(100% * var(--value));
+            height: 100%;
+        }
+
+        .clear {
+          border: none;
+          border-radius: 8px;
+          padding: 10px 12px;
+          color: white;
+          background-color: #202020;
+          transition: .3s;
+          cursor: pointer;
+          font-size: 18px;
+
+          &:hover {
+            background-color: #303030;
+          }
+        }
+
+        .result_number_container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+          font-size: 18px;
+          margin-left: 20px;
+        }
+
+        .result_number {
+          display: inline-flex;
+          border: 1px solid black;
+          width: 80px;
+          height: 80px;
+          align-items: center;
+          justify-content: center;
+          font-size: 40px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h2>Digit Recognizer</h2>
+        <button class="clear" id="clear">Clear</button>
+    </header>
+    <div class="container">
+        <canvas id="canvas" class="canvas" width="28" height="28"></canvas>
+        <div class="result" id="result"></div>
+        <div class="result_number_container">Number<span class="result_number" id="number"></span></div>
+    </div>
+    
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="static/script.js"></script>
+</body>
+</html>
